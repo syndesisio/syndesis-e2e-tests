@@ -23,6 +23,7 @@ public class CommonSteps {
         OpenShiftUtils.getInstance().apps().statefulSets().inNamespace(TestConfiguration.openShiftNamespace()).delete();
         OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).delete();
         OpenShiftUtils.getInstance().serviceAccounts().withName("syndesis-oauth-client").delete();
+        OpenShiftUtils.binary().execute("delete subscription jaeger-product");
         try {
             OpenShiftUtils.getInstance().clean();
             OpenShiftUtils.getInstance().waiters().isProjectClean().waitFor();

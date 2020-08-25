@@ -98,7 +98,7 @@ public class Syndesis implements Resource {
         changeRuntime(TestConfiguration.syndesisRuntime());
         checkRoute();
         TodoUtils.createDefaultRouteForTodo("todo2", "/");
-        jaegerWorkarounds();
+        //jaegerWorkarounds();
     }
 
     @Override
@@ -163,8 +163,8 @@ public class Syndesis implements Resource {
     public void jaegerWorkarounds() {
         new Thread(() -> {
             try {
-                OpenShiftWaitUtils.waitUntilPodAppears("jaeger-operator");
-                ensureImagePullForJaegerOperator();
+//                OpenShiftWaitUtils.waitUntilPodAppears("jaeger-operator");
+//                ensureImagePullForJaegerOperator();
                 OpenShiftWaitUtils.waitUntilPodAppears("syndesis-jaeger");
                 ensureImagePullForSyndesisJaeger();
                 Optional<Pod> jaegerPod = OpenShiftUtils.getPodByPartialName("syndesis-jaeger");
