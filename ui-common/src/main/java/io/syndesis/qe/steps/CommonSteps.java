@@ -68,17 +68,22 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
+import mmuzikar.api.ISuggestionProvider;
+import mmuzikar.api.Suggestion;
 
 @Slf4j
 public class CommonSteps {
@@ -385,8 +390,16 @@ public class CommonSteps {
         createConnections(accountsTalbe);
     }
 
+    public static final class PageTypeSuggestionProvider implements ISuggestionProvider {
+
+        @Override
+        public List<Object> provide(String s) {
+            return Arrays.asList("Home", "Integrations", "Connections", "Customizations", "Settings", "Support");
+        }
+    }
+
     @When("^navigate to the \"([^\"]*)\" page$")
-    public void navigateTo(String title) {
+    public void navigateTo(@Suggestion(PageTypeSuggestionProvider.class) String title) {
         try {
             OpenShiftWaitUtils.waitFor(() -> $(Element.NAVIGATION_PANEL).exists(), 30 * 1000L);
         } catch (TimeoutException | InterruptedException e) {
@@ -431,8 +444,15 @@ public class CommonSteps {
         new SyndesisRootPage().getLink(linkTitle).shouldBe(condition);
     }
 
+    public static final class ButtonNameProvider implements ISuggestionProvider {
+        @Override
+        public List<Object> provide(String s) {
+            return Selenide.$$(By.tagName("button")).stream().map(SelenideElement::text).collect(Collectors.toList());
+        }
+    }
+
     @When("^click? on the \"([^\"]*)\" button.*$")
-    public void clickOnButton(String buttonTitle) {
+    public void clickOnButton(@Suggestion(ButtonNameProvider.class) String buttonTitle) {
         UIUtils.ensureUILoaded();
         if ("Done".equals(buttonTitle)) {
             // this is hack to replace Done with Next if not present
@@ -471,8 +491,15 @@ public class CommonSteps {
         }
     }
 
+    public static final class LinkNameProvider implements ISuggestionProvider {
+        @Override
+        public List<Object> provide(String s) {
+            return Selenide.$$("a").stream().map(SelenideElement::text).collect(Collectors.toList());
+        }
+    }
+
     @When(".*clicks? on the \"([^\"]*)\" link.*$")
-    public void clickOnLink(String linkTitle) {
+    public void clickOnLink(@Suggestion(LinkNameProvider.class) String linkTitle) {
         if ("Customizations".equals(linkTitle) &&
             $(ByUtils.dataTestId("ui-api-client-connectors")).isDisplayed()) {
             //do not click when customizations menu is already visible

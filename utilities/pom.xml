@@ -211,6 +211,11 @@
 			<artifactId>marketplace-utilities</artifactId>
 			<version>${marketplaceutils.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>mmuzikar</groupId>
+			<artifactId>backendprovider</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
