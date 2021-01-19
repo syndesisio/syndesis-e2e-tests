@@ -45,6 +45,7 @@ public class DataMapper extends SyndesisPageObject {
 
         public static final By CONNECT_TO_MAPPING_BUTTON = ByUtils.dataTestId("connect-to-the-selected-mapping-button");
         public static final By CREATE_NEW_MAPPING_BUTTON = ByUtils.dataTestId("create-new-mapping-button");
+        public static final By ADD_NEW_MAPPING_BUTTON = ByUtils.dataTestId("add-new-mapping-button");
 
         public static final By CLOSING_MAPPING_DETAIL_BUTTON = ByUtils.dataTestId("close-mapping-detail-button");
 
@@ -142,6 +143,10 @@ public class DataMapper extends SyndesisPageObject {
      */
     private void createNewMapping(String sourceBucket, String source, String targetBucket, String target) {
         log.info("Mapping {} -> {}", source, target);
+
+        // create a brand new mapping
+        getRootElement().find(Element.ADD_NEW_MAPPING_BUTTON).shouldBe(visible).click();
+
         SelenideElement src = this.getSourceElementColumn();
         SelenideElement dest = this.getTargetElementColumn();
 
