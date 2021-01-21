@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<syndesis.version>1.12-SNAPSHOT</syndesis.version>
 		<syndesis.qe.version>0.1-SNAPSHOT</syndesis.qe.version>
-		<atlas.mapper.version>2.0.5</atlas.mapper.version>
+		<atlas.mapper.version>2.1.2</atlas.mapper.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
