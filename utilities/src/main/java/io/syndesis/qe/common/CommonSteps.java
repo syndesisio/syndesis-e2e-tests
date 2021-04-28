@@ -2,9 +2,6 @@ package io.syndesis.qe.common;
 
 import io.syndesis.qe.TestConfiguration;
 import io.syndesis.qe.component.ComponentUtils;
-import io.syndesis.qe.marketplace.openshift.OpenShiftService;
-import io.syndesis.qe.marketplace.quay.QuayService;
-import io.syndesis.qe.marketplace.quay.QuayUser;
 import io.syndesis.qe.resource.ResourceFactory;
 import io.syndesis.qe.resource.impl.Syndesis;
 import io.syndesis.qe.test.InfraFail;
@@ -12,7 +9,6 @@ import io.syndesis.qe.utils.OpenShiftUtils;
 import io.syndesis.qe.utils.PortForwardUtils;
 import io.syndesis.qe.wait.OpenShiftWaitUtils;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -26,7 +22,6 @@ import cz.xtf.core.openshift.crd.CustomResourceDefinitionContextProvider;
 import cz.xtf.core.waiting.SimpleWaiter;
 import cz.xtf.core.waiting.Waiter;
 import cz.xtf.core.waiting.WaiterException;
-import io.cucumber.java.en.Given;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import lombok.extern.slf4j.Slf4j;
@@ -90,52 +85,6 @@ public class CommonSteps {
             ComponentUtils.getComponentPods().forEach(p -> log.error("  " + p.getMetadata().getName()));
             InfraFail.fail("Wait for Syndesis undeployment failed, check error logs for details.", e);
         }
-    }
-
-    @Given("deploy Syndesis from OperatorHub")
-    public void deployOperatorHubStep() {
-        deployOperatorHub();
-    }
-
-    public static void deployOperatorHub() {
-        Syndesis syndesis = ResourceFactory.get(Syndesis.class);
-
-        QuayUser quayUser = TestConfiguration.getQuayUser();
-
-        QuayService quayService = new QuayService(
-            quayUser,
-            TestConfiguration.syndesisOperatorImage(),
-            syndesis.generateImageEnvVars());
-        String quayProject;
-        try {
-            quayProject = quayService.createQuayProject();
-        } catch (Exception e) {
-            InfraFail.fail("Creating project on quay failed", e);
-            return;
-        }
-
-        OpenShiftService openShiftService = TestConfiguration.getOpenShiftService(quayProject);
-
-        try {
-            openShiftService.deployOperator();
-        } catch (IOException e) {
-            InfraFail.fail("Deploying operator with marketplace failed", e);
-        }
-
-        // at this point we don't really need operator source anymore
-        // and we doon't need project on quay either, because all the necessary stuff
-        // has already been deployed, we can delete those
-        log.info("Cleaning all unnecessary resorces");
-        openShiftService.deleteOpsrcToken();
-        try {
-            openShiftService.deleteOperatorSource();
-            quayService.deleteQuayProject();
-        } catch (IOException e) {
-            InfraFail.fail("Fail during cleanup of quay project", e);
-        }
-
-        syndesis.deployCrAndRoutes();
-        CommonSteps.waitForSyndesis();
     }
 
     /**

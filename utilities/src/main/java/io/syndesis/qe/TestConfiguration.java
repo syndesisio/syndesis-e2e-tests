@@ -107,13 +107,12 @@ public class TestConfiguration {
 
     private static final String QUAY_USERNAME = "syndesis.config.quay.username";
     private static final String QUAY_PASSWORD = "syndesis.config.quay.password";
-    private static final String QUAY_NAMESPACE = "syndesis.config.quay.namespace";
-    private static final String QUAY_AUTH_TOKEN = "syndesis.config.quay.auth.token";
-    private static final String QUAY_OPSRC_TOKEN = "syndesis.config.quay.opsrc.token";
     private static final String INDEX_IMAGE = "syndesis.config.index.image";
     private static final String BUNDLE_IMAGE = "syndesis.config.bundle.image";
-    private static final String QUAY_PULL_SECRET = "syndesis.config.quay.pullsecret";
-    private static final String OPERATORHUB_ICSP_SCRIPT_URL = "syndesis.config.icsp.url";
+    private static final String BUNDLE_ICSP_FILE = "syndesis.config.bundle.icsp.file.url";
+    private static final String BUNDLE_REPOSITORY = "syndesis.config.bundle.repository.name";
+    private static final String BUNDLE_REPOSITORY_USERNAME = "syndesis.config.bundle.repository.username";
+    private static final String BUNDLE_REPOSITORY_PASSWORD = "syndesis.config.bundle.repository.password";
 
     private static final String KEYCLOAK_NAMESPACE = "keycloak.namespace";
     private static final String KEYCLOAK_SYNDESIS_REALM = "keycloak.syndesis.realm";
@@ -390,18 +389,6 @@ public class TestConfiguration {
         return get().readValue(QUAY_PASSWORD);
     }
 
-    public static String quayNamespace() {
-        return get().readValue(QUAY_NAMESPACE);
-    }
-
-    public static String quayAuthToken() {
-        return get().readValue(QUAY_AUTH_TOKEN);
-    }
-
-    public static String quayOpsrcToken() {
-        return get().readValue(QUAY_OPSRC_TOKEN);
-    }
-
     public static String getIndexImage() {
         return get().readValue(INDEX_IMAGE);
     }
@@ -410,12 +397,20 @@ public class TestConfiguration {
         return get().readValue(BUNDLE_IMAGE);
     }
 
-    public static String getQuayPullSecret() {
-        return get().readValue(QUAY_PULL_SECRET);
+    public static String getBundleRepository() {
+        return get().readValue(BUNDLE_REPOSITORY);
     }
 
-    public static String operatorhubIcspScriptURL() {
-        return get().readValue(OPERATORHUB_ICSP_SCRIPT_URL);
+    public static String getBundleRepositoryUsername() {
+        return get().readValue(BUNDLE_REPOSITORY_USERNAME);
+    }
+
+    public static String getBundleRepositoryPassword() {
+        return get().readValue(BUNDLE_REPOSITORY_PASSWORD);
+    }
+
+    public static String getIcspFile() {
+        return get().readValue(BUNDLE_ICSP_FILE);
     }
 
     public static String keycloakNamespace() {
@@ -429,7 +424,6 @@ public class TestConfiguration {
     public static String keyCloakIdpName() {
         return get().readValue(KEYCLOAK_IDP_NAME);
     }
-
 
     private Properties defaultValues() {
         final Properties defaultProps = new Properties();
@@ -642,9 +636,7 @@ public class TestConfiguration {
     public static QuayUser getQuayUser() {
         return new QuayUser(
             TestConfiguration.quayUsername(),
-            TestConfiguration.quayPassword(),
-            TestConfiguration.quayNamespace(),
-            TestConfiguration.quayAuthToken()
+            TestConfiguration.quayPassword()
         );
     }
 
@@ -661,14 +653,12 @@ public class TestConfiguration {
         );
         OpenShiftConfiguration openShiftConfiguration = OpenShiftConfiguration.builder()
             .namespace(openShiftNamespace())
-            .pullSecretName(syndesisPullSecretName())
-            .pullSecret(syndesisPullSecret())
-            .quayOpsrcToken(quayOpsrcToken())
-            .icspConfigURL(operatorhubIcspScriptURL())
+            .dockerUsername(getBundleRepositoryUsername())
+            .dockerPassword(getBundleRepositoryPassword())
+            .dockerRegistry(getBundleRepository())
+            .icspFile(getIcspFile())
             .build();
         return new OpenShiftService(
-            quayNamespace(),
-            quayProject,
             openShiftConfiguration,
             adminUser,
             defaultUser
